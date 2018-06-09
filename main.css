@@ -1,0 +1,30 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  border-radius: 2px;
+  transition: all 1s;
+}
+body {
+  background: #dddddd;
+}
+.test {
+  color: lightcoral;
+}
+#canvas {
+  margin-left: 20px;
+  margin-right: 0px;
+  margin-bottom: 20px;
+  padding: 0;
+  cursor: crosshair;
+  background: #ffffff;
+  border: 10px dotted lightblue;
+}
+#controls {
+  margin: 20px 0 20px 20px;
+}
+#rubberbandDiv {
+  position: absolute;
+  border: 3px solid blue;
+  cursor: crosshair;
+  display: none;
+}
