@@ -13,7 +13,6 @@ body {
 #canvas {
   margin-left: 20px;
   margin-right: 0px;
-  margin-bottom: 20px;
   padding: 0;
   cursor: crosshair;
   background: #ffffff;
@@ -31,7 +30,8 @@ body {
 
 /* 滑动条 */
 .controller__processBar {
-  width: 500px;
+  user-select: none;
+  width: 1040px;
   height: 30px;
   line-height: 30px;
   position: relative;
@@ -48,7 +48,7 @@ body {
 }
 .processBar--ahead {
   background-color: lightgray;
-  width: 400px;
+  width: 1000px;
 }
 .processBar--slider {
   position: absolute;
