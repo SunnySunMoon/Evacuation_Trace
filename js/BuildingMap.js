@@ -16,6 +16,9 @@ class Canvas {
   saveData () {
     this.imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
   }
+  restoreData () {
+    this.ctx.putImageData(this.imageData, 0, 0);
+  }
 }
 
 class BuildingMap extends Canvas{
@@ -66,9 +69,15 @@ class BuildingMap extends Canvas{
     let yCor = y*(this.step+1) + 1 + this.step/2;
     this.ctx.beginPath();
     this.ctx.arc(xCor, yCor, r, 0, 2*Math.PI);
-    //this.ctx.arc(x, y, r, 0, 2*Math.PI);
     this.ctx.fillStyle = 'red';
     this.ctx.fill();
-    //this.ctx.endPath();
+    this.ctx.closePath();
+  }
+  //绘制一帧数据
+  drawFrame (dataFrame) {
+    this.restoreData();
+    dataFrame.forEach(x => {
+      this.drawCircle(x.x, x.y, 4);
+    });
   }
 }
