@@ -69,8 +69,9 @@ locationDataPromise.
 		localtionData = timeFrameSplit(locationData, 'frame');
 		//初始化控制器与显示
 		controller = new Controller ('controls', localtionData, 70);
-		controller.registerPlugins(pluginPrevious, 
+		controller.registerPlugins(
 			pluginProcessBar,
+			pluginPrevious, 
 			plugiNext, 
 			pluginStart);
 		buildingMap.drawFrame(controller.getCurrentFrame());
