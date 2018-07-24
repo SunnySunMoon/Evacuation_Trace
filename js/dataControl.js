@@ -1,11 +1,18 @@
 //控制数据帧
-class Controller {
+class Controller { 
   constructor (domId, data = [], fq = 200) {
     this.data = data;
     this.fq = fq;
     this.rootDom = document.getElementById(domId);
     this.loadTo(0); //默认从第一帧数据开始
     this._current = 0; 
+    this.timer = 0; //定时器
+  }
+  get current() {
+    return this._current;
+  }
+  set current(newValue) {
+    this._current = newValue;
   }
   //注册插件
   registerPlugins (...plugins) {
@@ -21,35 +28,35 @@ class Controller {
   }
   //获取当前数据帧
   getCurrentFrame () {
-    const current = this.data[this._current];
+    const current = this.data[this.current];
     return current; 
   }
   //获取当前数据帧的下标
   getCurrentIdx () {
-    return this._current;
+    return this.current; 
   }
   //跳转到对应数据帧
   loadTo (idx) {
-    this._current = idx;
-    return this.data[this._current];
+    this.current = idx;
+    return this.data[this.current];
   }
   //跳转到下一帧数据
   loadNext () {
-    if (this._current == this.data.length-1) {
+    if (this.current == this.data.length-1) {
       alert('已经是最后一帧!');
       return ;
     }
-    this._current++;
-    return this.data[this._current];
+    this.current++;
+    return this.data[this.current];
   }
   //跳转到前一帧数据
   loadPrevious () {
-    if(this._current == 0) {
+    if(this.current == 0) {
       alert('已经是第一帧!');
       return ;
     }
-    this._current--;
-    return this.data[this._current];
+    this.current--;
+    return this.data[this.current];
   }
 }
 
@@ -93,11 +100,11 @@ const pluginStart = {
     if (start) {
       start.addEventListener('click', evt => {
         buildingMap.drawFrame(controller.getCurrentFrame());
-        timer = setInterval(() => {
+        controller.timer = setInterval(() => {
           if (controller.getCurrentIdx() != controller.data.length - 1) {
             buildingMap.drawFrame(controller.loadNext());
           } else {
-            clearInterval(timer);
+            clearInterval(controller.timer);
           }
         }, controller.fq);
       })
@@ -138,7 +145,7 @@ const pluginProcessBar = {
         evt.stopPropagation();
         drag = true;
       });
-      slider.addEventListener('mouseup', evt => {
+      document.addEventListener('mouseup', evt => {
         drag = false;
       })
       processBar.addEventListener('mousemove', evt => {
