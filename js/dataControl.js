@@ -12,7 +12,15 @@ class Controller {
     return this._current;
   }
   set current(newValue) {
+    //console.log('set current:', newValue)
     this._current = newValue;
+    const event = new CustomEvent('slide', {
+      bubbles: true,
+      detail: {
+        idx: newValue 
+      }
+    });
+    this.rootDom.dispatchEvent(event);
   }
   //注册插件
   registerPlugins (...plugins) {
@@ -130,12 +138,8 @@ const pluginProcessBar = {
     if (slider) {
       //鼠标进度条点击跳转
       processBar.addEventListener('click', evt => {
-        console.log(evt.clientX)
+        //只用写改变current 的代码，滑动条样式集中在事件监听函数写
         this.offset = evt.clientX - processBar.offsetLeft - 10;
-        slider.style.left = this.offset + 'px';
-        past.style.width = this.offset + 'px';
-        ahead.style.width = 1000 - this.offset + 'px';
-        
         let idx = this.offset/1000 * controller.data.length;
         idx = Math.ceil(idx);
         buildingMap.drawFrame(controller.loadTo(idx-1));
@@ -145,6 +149,7 @@ const pluginProcessBar = {
         evt.stopPropagation();
         drag = true;
       });
+      //鼠标松开后取消拖动状态
       document.addEventListener('mouseup', evt => {
         drag = false;
       })
@@ -160,11 +165,14 @@ const pluginProcessBar = {
           buildingMap.drawFrame(controller.loadTo(idx-1));
         }
       });
-      // processBar.addEventListener('mouseup', evt => {
-      //   let idx = this.offset/1000 * controller.data.length;
-      //   idx = Math.ceil(idx);
-      //   buildingMap.drawFrame(controller.loadTo(idx-1));
-      // })
+      //监听其余控件引起的current改变事件
+      controller.rootDom.addEventListener('slide', evt => {
+        console.log('in')
+        this.offset = 1000 * evt.detail.idx/controller.data.length;
+        slider.style.left = this.offset + 'px';
+        past.style.width = this.offset + 'px';
+        ahead.style.width = 1000 - this.offset + 'px';
+      })
     }
   }
 }
