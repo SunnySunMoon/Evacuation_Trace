@@ -52,18 +52,18 @@ class Controller {
   loadNext () {
     if (this.current == this.data.length-1) {
       alert('已经是最后一帧!');
-      return ;
+    } else {
+      this.current++;
     }
-    this.current++;
     return this.data[this.current];
   }
   //跳转到前一帧数据
   loadPrevious () {
     if(this.current == 0) {
       alert('已经是第一帧!');
-      return ;
+    } else {
+      this.current--;
     }
-    this.current--;
     return this.data[this.current];
   }
 }
@@ -77,7 +77,7 @@ const pluginPrevious = {
     let previous = controller.rootDom.querySelector('.controller__button--previous');
     if (previous) {
       previous.addEventListener('click', evt => {
-        clearInterval(timer);
+        clearInterval(controller.timer);
         buildingMap.drawFrame(controller.loadPrevious());
       });
     }
@@ -92,7 +92,7 @@ const plugiNext = {
     let next = controller.rootDom.querySelector('.controller__button--next');
     if (next) {
       next.addEventListener('click', evt => {
-        clearInterval(timer);
+        clearInterval(controller.timer);
         buildingMap.drawFrame(controller.loadNext());
       });
     }
@@ -138,8 +138,9 @@ const pluginProcessBar = {
     if (slider) {
       //鼠标进度条点击跳转
       processBar.addEventListener('click', evt => {
+        clearInterval(controller.timer);
         //只用写改变current 的代码，滑动条样式集中在事件监听函数写
-        this.offset = evt.clientX - processBar.offsetLeft - 10;
+        this.offset = evt.clientX - 20;
         let idx = this.offset/1000 * controller.data.length;
         idx = Math.ceil(idx);
         buildingMap.drawFrame(controller.loadTo(idx-1));
@@ -154,23 +155,23 @@ const pluginProcessBar = {
         drag = false;
       })
       processBar.addEventListener('mousemove', evt => {
-        if (drag && evt.clientX >= 40 && evt.clientX <= 1030) {
-          this.offset = evt.clientX - processBar.offsetLeft - 10;
+        if (drag && evt.clientX >= 20 && evt.clientX <= 1020) {
+          this.offset = evt.clientX - 20;
           slider.style.left = this.offset + 'px';
           past.style.width = this.offset + 'px';
           ahead.style.width = 1000 - this.offset + 'px';
 
           let idx = this.offset/1000 * controller.data.length;
           idx = Math.ceil(idx);
-          buildingMap.drawFrame(controller.loadTo(idx-1));
+          idx = idx == 0 ? 0 : idx - 1;
+          buildingMap.drawFrame(controller.loadTo(idx));
         }
       });
       //监听其余控件引起的current改变事件
       controller.rootDom.addEventListener('slide', evt => {
-        console.log('in')
         this.offset = 1000 * evt.detail.idx/controller.data.length;
-        slider.style.left = this.offset + 'px';
-        past.style.width = this.offset + 'px';
+        slider.style.left = this.offset - 10 + 'px';
+        past.style.width = this.offset  + 'px';
         ahead.style.width = 1000 - this.offset + 'px';
       })
     }

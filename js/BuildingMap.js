@@ -9,8 +9,8 @@ class Canvas {
     let box = this.canvas.getBoundingClientRect();
     //减去border
     return {
-      x: x - box.left - (box.width - this.canvas.width)/2,
-      y: y - box.top  - (box.height - this.canvas.height)/2
+      x: x - box.left - (box.width - this.canvas.width)/2 - window.pageXOffset,
+      y: y - box.top  - (box.height - this.canvas.height)/2 - window.pageYOffset
     }
   }
   saveData () {
@@ -77,7 +77,38 @@ class BuildingMap extends Canvas{
   drawFrame (dataFrame) {
     this.restoreData();
     dataFrame.forEach(x => {
-      this.drawCircle(x.x, x.y, 4);
+      this.drawCircle(x.x, x.y, this.step/2 - 1);
     });
+  }
+
+  //坐标匹配
+  hoverBox (eX, eY, data) {
+    let loc = this.windowToCanvas(eX, eY);
+    let personArr = [];
+    for (let i=0; i<data.length; i++) {
+      let xCor = data[i].x*(this.step+1) + 1 + this.step/2;
+      let yCor = data[i].y*(this.step+1) + 1 + this.step/2;
+      if (((xCor-loc.x)**2 + (yCor-loc.y)**2) <= (this.step/2 -1)**2) {
+        let number = data[i].personNumber;
+        personData.forEach(p => {
+          if (p.number == number) {
+            personArr.push(p.name);
+          }
+        })
+      }
+    }
+    //显示人名浮动窗
+    let popOver = document.getElementsByClassName("popOver")[0];
+
+    //若匹配到则显示悬浮窗，否则隐藏
+    if (personArr.length === 0) {
+      popOver.style.display = 'none';
+    } else {
+      let text = personArr.join('<br/>');
+      popOver.innerHTML = text;
+      popOver.style.display = "block";
+    }
+    popOver.style.left = eX - window.pageXOffset + 5 +'px';
+    popOver.style.top = eY - window.pageYOffset + 5 + 'px';
   }
 }

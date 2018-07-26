@@ -31,7 +31,7 @@ body {
 /* 滑动条 */
 .controller__processBar {
   user-select: none;
-  width: 1040px;
+  width: 1005px;
   height: 30px;
   line-height: 30px;
   position: relative;
@@ -42,7 +42,6 @@ body {
   border-radius: 10px;
 }
 .processBar--past {
-  margin-left: 20px;
   background-color: deepskyblue;
   width: 0;
 }
@@ -52,7 +51,7 @@ body {
 }
 .processBar--slider {
   position: absolute;
-  left: 10px;
+  left: -10px;
   top: 5px;
   bottom: 5px;
   width: 20px;
@@ -60,4 +59,15 @@ body {
   background-color: white;
   border: 1px solid lightgray;
   border-radius: 10px;
+}
+
+.popOver {
+  position: fixed;
+  min-width: 150px;
+  padding: 4px;
+  background-color: #eee;
+  border: 1px solid lightgray;
+  box-shadow: 1px 1px 2px 2px lightgray;
+  display: none;
+  transition: all 0.5s
 }

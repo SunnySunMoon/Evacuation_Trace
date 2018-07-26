@@ -73,8 +73,13 @@ locationDataPromise.
 			pluginProcessBar,
 			pluginPrevious, 
 			plugiNext, 
-			pluginStart);
+			pluginStart); 
 		buildingMap.drawFrame(controller.getCurrentFrame());
+
+		buildingMap.canvas.addEventListener('mousemove', evt => {
+			let idx = controller.getCurrentIdx();
+			buildingMap.hoverBox(evt.pageX, evt.pageY, localtionData[idx]);
+		})
 	});
 
 //将时间段数据按时间段拆分
