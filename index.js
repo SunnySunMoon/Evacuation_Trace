@@ -1,6 +1,8 @@
 const canvas = document.getElementById('canvas');
+const stainCanvas = document.getElementById('stain-canvas');
 //绘制网格地图
 const buildingMap = new BuildingMap('canvas', 10);
+const stainMap = new BuildingMap('stain-canvas', 10);
 var mapData = [];
 //获取建筑地图原始数据并绘制地图
 ajax('./data/BUILDING_DATA.txt').then(str => {
@@ -75,12 +77,40 @@ locationDataPromise.
 			plugiNext, 
 			pluginStart); 
 		buildingMap.drawFrame(controller.getCurrentFrame());
-
-		buildingMap.canvas.addEventListener('mousemove', evt => {
+		//mousemove激活悬浮窗,因为stain层遮盖了地图和点层，因此不能直接把事件绑定到buildingMap
+		//而应该绑定到stainMap上
+		stainMap.canvas.addEventListener('mousemove', evt => {
 			let idx = controller.getCurrentIdx();
-			buildingMap.hoverBox(evt.pageX, evt.pageY, localtionData[idx]);
-		})
+			stainMap.hoverBox(evt.pageX, evt.pageY, localtionData[idx]);
+		});
 	});
+
+const stainButton = document.getElementById('stain-button');
+const finishButton = document.getElementById('finish-button');
+const removeButton = document.getElementById('remove-button');
+//染色按钮绑定点击事件
+stainButton.addEventListener('click', () => {
+	stainMap.isStainMode = true;
+});
+
+stainCanvas.addEventListener('mousedown', evt => {
+	stainMap.dragStatus = true;
+	stainMap.saveData();
+	stainMap.start = stainMap.windowToCanvas(evt.pageX, evt.pageY);
+});
+stainCanvas.addEventListener('mousemove', evt => {
+	let loc = stainMap.windowToCanvas(evt.pageX, evt.pageY);
+	if (stainMap.dragStatus && stainMap.isStainMode) {
+		stainMap.ctx.fillStyle = 'rgba(123,2,23,0.4)';
+		stainMap.restoreData();
+		stainMap.end = loc;
+		stainMap.drawRectGrid(stainMap.start, loc);
+	}
+});
+stainCanvas.addEventListener('mouseup', evt => {
+	stainMap.dragStatus = false;
+})
+
 
 //将时间段数据按时间段拆分
 function timeFrameSplit (arr, prop) {
@@ -99,7 +129,4 @@ function timeFrameSplit (arr, prop) {
 	return temp;
 }
 
-//绘制一帧
-function drawTimeFrame (timeFrame) {
-	
-} 
+
