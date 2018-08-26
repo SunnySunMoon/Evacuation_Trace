@@ -136,6 +136,10 @@ const pluginProcessBar = {
       slider = controller.rootDom.querySelector('.processBar--slider');
       let drag = false;
     if (slider) {
+      /* click 和 mousemove 事件的handler只负责处理offset和idx
+        然后调用drawFrame方法，改变current，发布slide自定义事件
+        在slide事件的handler中统一修改进度条相关样式
+      */
       //鼠标进度条点击跳转
       processBar.addEventListener('click', evt => {
         clearInterval(controller.timer);
@@ -157,9 +161,6 @@ const pluginProcessBar = {
       processBar.addEventListener('mousemove', evt => {
         if (drag && evt.clientX >= 20 && evt.clientX <= 1020) {
           this.offset = evt.clientX - 20;
-          slider.style.left = this.offset + 'px';
-          past.style.width = this.offset + 'px';
-          ahead.style.width = 1000 - this.offset + 'px';
 
           let idx = this.offset/1000 * controller.data.length;
           idx = Math.ceil(idx);

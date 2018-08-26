@@ -26,6 +26,10 @@ class BuildingMap extends Canvas{
     super(id);
     this.drawGrid(step+1);
     this.step = step;
+    this.start = {}; //染色起始坐标
+    this.end = {}; //染色结束坐标
+    this.dragStatus = false;  //染色拖动状态
+    this.isStainMode = false;  //染色模式是否开启
   }
   //底部网格绘制
   drawGrid (whiteSpace) {
@@ -44,12 +48,13 @@ class BuildingMap extends Canvas{
     }
     this.ctx.stroke();
   }
+
   //按格绘制
-  drawRectGrid (start, end) {
-    start.x = start.x - start.x % this.step;
-    start.y = start.y - start.y % this.step;
-    end.x = end.x - end.x % this.step;
-    end.y = end.y - end.y % this.step;
+  drawRectGrid (start, end) {  // +1 代表网格线占用的宽度 
+    start.x = start.x - start.x % (this.step+1);
+    start.y = start.y - start.y % (this.step+1);
+    end.x = end.x - end.x % (this.step+1);
+    end.y = end.y - end.y % (this.step+1);
     this.ctx.fillRect(start.x, start.y, end.x-start.x, end.y-start.y);
   }
   //从数据绘制地图
@@ -81,7 +86,7 @@ class BuildingMap extends Canvas{
     });
   }
 
-  //坐标匹配
+  //mousemove悬浮窗
   hoverBox (eX, eY, data) {
     let loc = this.windowToCanvas(eX, eY);
     let personArr = [];
