@@ -3,6 +3,7 @@ const stainCanvas = document.getElementById('stain-canvas');
 //绘制网格地图
 const buildingMap = new BuildingMap('canvas', 10);
 const stainMap = new BuildingMap('stain-canvas', 10);
+const stainArea = []; //声明用来保存染色区域的数组
 var mapData = [];
 //获取建筑地图原始数据并绘制地图
 ajax('./data/BUILDING_DATA.txt').then(str => {
@@ -18,6 +19,7 @@ ajax('./data/BUILDING_DATA.txt').then(str => {
 		mapArr.push(row);
 	}
 	mapArr.reverse(); //数据本身有误，行需要倒置一次
+	mapData = mapArr;
 	buildingMap.fromData(mapArr);
 	buildingMap.saveData(); //地图一旦生成就不会变动，因此保存为背景
 	//保存当前数据
@@ -97,17 +99,32 @@ stainCanvas.addEventListener('mousedown', evt => {
 	stainMap.dragStatus = true;
 	stainMap.saveData();
 	stainMap.start = stainMap.windowToCanvas(evt.pageX, evt.pageY);
+	let area = {
+		start: {
+			x: Math.floor(stainMap.start.x / (stainMap.step + 1)),
+			y: Math.floor(stainMap.start.y / (stainMap.step + 1))
+		},
+		end: {}
+	}
+	stainArea.push(area);
 });
 stainCanvas.addEventListener('mousemove', evt => {
 	let loc = stainMap.windowToCanvas(evt.pageX, evt.pageY);
 	if (stainMap.dragStatus && stainMap.isStainMode) {
-		stainMap.ctx.fillStyle = 'rgba(123,2,23,0.4)';
+		stainArea[stainArea.length - 1].end = {
+			x: Math.floor(loc.x / (stainMap.step + 1)),
+			y: Math.floor(loc.y / (stainMap.step + 1))
+		}
+		stainMap.ctx.fillStyle = 'rgba(0,0,255,0.2)';
 		stainMap.restoreData();
 		stainMap.end = loc;
 		stainMap.drawRectGrid(stainMap.start, loc);
 	}
 });
 stainCanvas.addEventListener('mouseup', evt => {
+	stainMap.dragStatus = false;
+});
+stainCanvas.addEventListener('mouseout', evt => {
 	stainMap.dragStatus = false;
 })
 
