@@ -28,6 +28,14 @@ body {
   background-color: rgba(0,0,0,0);
   border: 10px dotted lightblue;
 }
+#stain-control {
+  position: absolute;
+  left: 1050px;
+  top: 10px;
+}
+#stain-control>button:nth-of-type(n) {
+  margin-right: 10px;
+}
 #controls {
   margin: 20px 0 20px 20px;
 }
