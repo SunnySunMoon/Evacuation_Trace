@@ -74,8 +74,9 @@ class BuildingMap extends Canvas{
     let yCor = y*(this.step+1) + 1 + this.step/2;
     this.ctx.beginPath();
     this.ctx.arc(xCor, yCor, r, 0, 2*Math.PI);
-    this.ctx.fillStyle = 'red';
-    this.ctx.fill();
+    this.ctx.strokeStyle = 'red';
+    this.ctx.lineWidth = '2';
+    this.ctx.stroke();
     this.ctx.closePath();
   }
   //绘制一帧数据
