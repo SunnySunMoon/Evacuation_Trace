@@ -3,7 +3,7 @@ const stainCanvas = document.getElementById('stain-canvas');
 //绘制网格地图
 const buildingMap = new BuildingMap('canvas', 10);
 const stainMap = new BuildingMap('stain-canvas', 10);
-const stainArea = []; //声明用来保存染色区域的数组
+
 var mapData = [];
 //获取建筑地图原始数据并绘制地图
 ajax('./data/BUILDING_DATA.txt').then(str => {
@@ -87,9 +87,17 @@ locationDataPromise.
 		});
 	});
 
+
+
+/* 染色相关代码 */
+
 const stainButton = document.getElementById('stain-button');
-const finishButton = document.getElementById('finish-button');
-const removeButton = document.getElementById('remove-button');
+const undoButton = document.getElementById('stain-undo');
+const emptyButton = document.getElementById('stain-empty');
+
+const stainArea = []; //声明用来保存染色区域的数组
+var stainImageData = []; //声明用来保存染色区域状态的数组
+
 //染色按钮绑定点击事件
 stainButton.addEventListener('click', () => {
 	stainMap.isStainMode = true;
@@ -98,6 +106,7 @@ stainButton.addEventListener('click', () => {
 stainCanvas.addEventListener('mousedown', evt => {
 	stainMap.dragStatus = true;
 	stainMap.saveData();
+	stainImageData.push(stainMap.imageData);
 	stainMap.start = stainMap.windowToCanvas(evt.pageX, evt.pageY);
 	let area = {
 		start: {
@@ -128,6 +137,21 @@ stainCanvas.addEventListener('mouseout', evt => {
 	stainMap.dragStatus = false;
 })
 
+//撤销按钮绑定点击事件
+undoButton.addEventListener('click', e => {
+	const data = stainImageData.pop();
+	if (data != undefined) {
+		stainMap.imageData = data;
+		stainMap.restoreData();
+	}
+});
+//清空按钮绑定点击事件
+emptyButton.addEventListener('click', e => {
+	const data = stainImageData[0];
+	stainImageData = [];
+	stainMap.imageData = data;
+	stainMap.restoreData();
+})
 
 //将时间段数据按时间段拆分
 function timeFrameSplit (arr, prop) {
