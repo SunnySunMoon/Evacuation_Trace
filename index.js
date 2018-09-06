@@ -1,9 +1,8 @@
 const canvas = document.getElementById('canvas');
 const stainCanvas = document.getElementById('stain-canvas');
 //绘制网格地图
-const buildingMap = new BuildingMap('canvas', 10);
+const mainMap = new BuildingMap('canvas', 10);
 const stainMap = new BuildingMap('stain-canvas', 10);
-
 var mapData = [];
 //获取建筑地图原始数据并绘制地图
 ajax('./data/BUILDING_DATA.txt').then(str => {
@@ -20,8 +19,8 @@ ajax('./data/BUILDING_DATA.txt').then(str => {
 	}
 	mapArr.reverse(); //数据本身有误，行需要倒置一次
 	mapData = mapArr;
-	buildingMap.fromData(mapArr);
-	buildingMap.saveData(); //地图一旦生成就不会变动，因此保存为背景
+	mainMap.fromData(mapArr);
+	mainMap.saveData(); //地图一旦生成就不会变动，因此保存为背景
 	//保存当前数据
 }).catch(err => {
 	console.log(err);
@@ -43,6 +42,7 @@ personDataPromise.then(str => {
 			name,
 		}
 	});
+	mainMap.personColor = new Array(personData.length).fill('white');
 	strArr = null;
 });
 
@@ -70,20 +70,20 @@ locationDataPromise.
 		});
 
 		//按帧分割
-		localtionData = timeFrameSplit(locationData, 'frame');
+		localFrameData = timeFrameSplit(locationData, 'frame');
 		//初始化控制器与显示
-		controller = new Controller ('controls', localtionData, 70);
+		controller = new Controller ('controls', localFrameData, 70);
 		controller.registerPlugins(
 			pluginProcessBar,
 			pluginPrevious, 
 			plugiNext, 
 			pluginStart); 
-		buildingMap.drawFrame(controller.getCurrentFrame());
+		mainMap.drawFrame(controller.getCurrentFrame());
 		//mousemove激活悬浮窗,因为stain层遮盖了地图和点层，因此不能直接把事件绑定到buildingMap
 		//而应该绑定到stainMap上
 		stainMap.canvas.addEventListener('mousemove', evt => {
 			let idx = controller.getCurrentIdx();
-			stainMap.hoverBox(evt.pageX, evt.pageY, localtionData[idx]);
+			stainMap.hoverBox(evt.pageX, evt.pageY, localFrameData[idx]);
 		});
 	});
 
@@ -95,8 +95,7 @@ const stainButton = document.getElementById('stain-button');
 const undoButton = document.getElementById('stain-undo');
 const emptyButton = document.getElementById('stain-empty');
 
-const stainArea = []; //声明用来保存染色区域的数组
-var stainImageData = []; //声明用来保存染色区域状态的数组
+var stainArea = []; //声明用来保存染色区域的数组
 
 //染色按钮绑定点击事件
 stainButton.addEventListener('click', () => {
@@ -106,14 +105,15 @@ stainButton.addEventListener('click', () => {
 stainCanvas.addEventListener('mousedown', evt => {
 	stainMap.dragStatus = true;
 	stainMap.saveData();
-	stainImageData.push(stainMap.imageData);
+	stainMap.statusArr.push(stainMap.imageData);
 	stainMap.start = stainMap.windowToCanvas(evt.pageX, evt.pageY);
 	let area = {
 		start: {
 			x: Math.floor(stainMap.start.x / (stainMap.step + 1)),
 			y: Math.floor(stainMap.start.y / (stainMap.step + 1))
 		},
-		end: {}
+		end: {},
+		color: 'rgba(0,0,255,0.2)'
 	}
 	stainArea.push(area);
 });
@@ -121,8 +121,8 @@ stainCanvas.addEventListener('mousemove', evt => {
 	let loc = stainMap.windowToCanvas(evt.pageX, evt.pageY);
 	if (stainMap.dragStatus && stainMap.isStainMode) {
 		stainArea[stainArea.length - 1].end = {
-			x: Math.floor(loc.x / (stainMap.step + 1)),
-			y: Math.floor(loc.y / (stainMap.step + 1))
+			x: Math.floor(loc.x / (stainMap.step + 1)) - 1,
+			y: Math.floor(loc.y / (stainMap.step + 1)) - 1
 		}
 		stainMap.ctx.fillStyle = 'rgba(0,0,255,0.2)';
 		stainMap.restoreData();
@@ -132,6 +132,8 @@ stainCanvas.addEventListener('mousemove', evt => {
 });
 stainCanvas.addEventListener('mouseup', evt => {
 	stainMap.dragStatus = false;
+	stainPerson();
+	mainMap.drawFrame(controller.getCurrentFrame());
 });
 stainCanvas.addEventListener('mouseout', evt => {
 	stainMap.dragStatus = false;
@@ -139,16 +141,18 @@ stainCanvas.addEventListener('mouseout', evt => {
 
 //撤销按钮绑定点击事件
 undoButton.addEventListener('click', e => {
-	const data = stainImageData.pop();
+	const data = stainMap.statusArr.pop();
 	if (data != undefined) {
 		stainMap.imageData = data;
 		stainMap.restoreData();
+		stainArea.pop();
 	}
 });
 //清空按钮绑定点击事件
 emptyButton.addEventListener('click', e => {
-	const data = stainImageData[0];
-	stainImageData = [];
+	const data = stainMap.statusArr[0];
+	stainMap.statusArr = [];
+	stainArea = [];
 	stainMap.imageData = data;
 	stainMap.restoreData();
 })
@@ -170,4 +174,17 @@ function timeFrameSplit (arr, prop) {
 	return temp;
 }
 
+//根据stainArea对象数组改变localFrameData中对应人员的颜色属性
+function stainPerson () {
+	stainArea.forEach(area => {
+		for (let i=0; i<localFrameData.length; i++) {
+			localFrameData[i].forEach(person => {
+				if (person.x >= area.start.x && person.x <= area.end.x
+					&& person.y >= area.start.y && person.y <= area.end.y) {
+						mainMap.personColor[person.personNumber] = area.color;
+					}
+			})
+		}
+	})
+}
 

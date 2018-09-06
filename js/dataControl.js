@@ -78,7 +78,7 @@ const pluginPrevious = {
     if (previous) {
       previous.addEventListener('click', evt => {
         clearInterval(controller.timer);
-        buildingMap.drawFrame(controller.loadPrevious());
+        mainMap.drawFrame(controller.loadPrevious());
       });
     }
   }
@@ -93,7 +93,7 @@ const plugiNext = {
     if (next) {
       next.addEventListener('click', evt => {
         clearInterval(controller.timer);
-        buildingMap.drawFrame(controller.loadNext());
+        mainMap.drawFrame(controller.loadNext());
       });
     }
   }
@@ -107,10 +107,10 @@ const pluginStart = {
     let start = controller.rootDom.querySelector('.controller__button--start');
     if (start) {
       start.addEventListener('click', evt => {
-        buildingMap.drawFrame(controller.getCurrentFrame());
+        mainMap.drawFrame(controller.getCurrentFrame());
         controller.timer = setInterval(() => {
           if (controller.getCurrentIdx() != controller.data.length - 1) {
-            buildingMap.drawFrame(controller.loadNext());
+            mainMap.drawFrame(controller.loadNext());
           } else {
             clearInterval(controller.timer);
           }
@@ -147,7 +147,7 @@ const pluginProcessBar = {
         this.offset = evt.clientX - 20;
         let idx = this.offset/1000 * controller.data.length;
         idx = Math.ceil(idx);
-        buildingMap.drawFrame(controller.loadTo(idx-1));
+        mainMap.drawFrame(controller.loadTo(idx-1));
       });
       //滑块拖动跳转
       slider.addEventListener('mousedown', evt => {
@@ -165,7 +165,7 @@ const pluginProcessBar = {
           let idx = this.offset/1000 * controller.data.length;
           idx = Math.ceil(idx);
           idx = idx == 0 ? 0 : idx - 1;
-          buildingMap.drawFrame(controller.loadTo(idx));
+          mainMap.drawFrame(controller.loadTo(idx));
         }
       });
       //监听其余控件引起的current改变事件
