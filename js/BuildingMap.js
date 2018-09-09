@@ -4,7 +4,7 @@ class Canvas {
     this.ctx = this.canvas.getContext('2d');
     this.imageData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
     this.statusArr = []; //用于保存绘图状态的数组
-  }
+  } 
   //窗口坐标转换为canvas坐标
   windowToCanvas (x, y) {
     let box = this.canvas.getBoundingClientRect();
@@ -72,7 +72,6 @@ class BuildingMap extends Canvas{
   }
   //绘制圆
   drawCircle (x, y, r, color) {
-    console.log(color);
     let xCor = x*(this.step+1) + 1 + this.step/2;
     let yCor = y*(this.step+1) + 1 + this.step/2;
     this.ctx.beginPath();

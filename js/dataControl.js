@@ -7,7 +7,7 @@ class Controller {
     this.loadTo(0); //默认从第一帧数据开始
     this._current = 0; 
     this.timer = 0; //定时器
-  }
+  } 
   get current() {
     return this._current;
   }
