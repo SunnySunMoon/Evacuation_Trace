@@ -9,7 +9,7 @@ ajax('./data/BUILDING_DATA.txt').then(str => {
 	//以正则匹配的方式剔除换行
 	let strArr = str.replace(/[\r\n]/g, "").trim().split(' ');
 	let mapArr = [];
-	for (let i=0; i<strArr.length;) {
+	for (let i=0; i<strArr.length;) { 
 		let row = [];
 		for (let j=0; j<91; j++) {
 			row.push(strArr[i]);
@@ -47,7 +47,9 @@ personDataPromise.then(str => {
 });
 
 
-let locationData = [];
+let locationData = []; //全时间全人员数据数组
+let localFrameData = []; //按帧分割数据数组
+let personFrameData = []; //按人员分割数据数组
 let controller = null;
 let timer = null;
 //获取所有时间人员移动数据
@@ -58,9 +60,7 @@ locationDataPromise.
 		//删除第一行字段行
 		strArr.shift(); 
 		locationData = strArr.map(item => {
-			let [frame, personNumber, x, y] = item.trim().split('\t');
-			x = parseInt(x);
-			y = parseInt(y);
+			let [frame, personNumber, x, y] = item.trim().split('\t').map(x => parseInt(x));
 			return {
 				frame,
 				personNumber,
@@ -68,9 +68,9 @@ locationDataPromise.
 				y,
 			}
 		});
-
 		//按帧分割
-		localFrameData = timeFrameSplit(locationData, 'frame');
+		localFrameData = timeFrameSplit(locationData);
+		personFrameData = personFrameSplit(locationData, personData.length);
 		//初始化控制器与显示
 		controller = new Controller ('controls', localFrameData, 70);
 		controller.registerPlugins(
@@ -113,7 +113,8 @@ stainCanvas.addEventListener('mousedown', evt => {
 			y: Math.floor(stainMap.start.y / (stainMap.step + 1))
 		},
 		end: {},
-		color: 'rgba(0,0,255,0.2)'
+		color: 'rgba(0,0,255,0.2)',
+		people: [],  //保存被染色人员序号
 	}
 	stainArea.push(area);
 });
@@ -145,8 +146,10 @@ undoButton.addEventListener('click', e => {
 	if (data != undefined) {
 		stainMap.imageData = data;
 		stainMap.restoreData();
-		stainArea.pop();
-	}
+		const people = stainArea.pop().people;
+		people.forEach(x => mainMap.personColor[x] = 'white');
+		mainMap.drawFrame(controller.getCurrentFrame());
+	}	
 });
 //清空按钮绑定点击事件
 emptyButton.addEventListener('click', e => {
@@ -155,16 +158,20 @@ emptyButton.addEventListener('click', e => {
 	stainArea = [];
 	stainMap.imageData = data;
 	stainMap.restoreData();
+	mainMap.personColor.forEach((x,i,arr) => {
+		arr[i] = 'white';
+	})
+	mainMap.drawFrame(controller.getCurrentFrame());
 })
 
-//将时间段数据按时间段拆分
-function timeFrameSplit (arr, prop) {
+//将轨迹数据按帧拆分
+function timeFrameSplit (arr) {
 	let temp = [];
 	let index = -1;
 	let timeIdx = [];
 	arr.forEach( x => {
-		if(! timeIdx.includes(x[prop])) {
-			timeIdx.push(x[prop]);
+		if(! timeIdx.includes(x.frame)) {
+			timeIdx.push(x.frame);
 			temp[++index] = [];
 			temp[index].push(x);
 		} else {
@@ -173,18 +180,32 @@ function timeFrameSplit (arr, prop) {
 	});
 	return temp;
 }
+//将轨迹数据按人员拆分
+function personFrameSplit (arr, length) {
+	let temp = [];
+	//temp.fill([])将导致bug，所有成员指向同一个数组内存地址。
+	for (let i=0; i<length; i++) {
+		temp[i] = [];
+	}
+	arr.forEach(x => {
+		temp[x.personNumber].push(x);
+	});
+	return temp;
+}
 
 //根据stainArea对象数组改变localFrameData中对应人员的颜色属性
 function stainPerson () {
 	stainArea.forEach(area => {
-		for (let i=0; i<localFrameData.length; i++) {
-			localFrameData[i].forEach(person => {
-				if (person.x >= area.start.x && person.x <= area.end.x
-					&& person.y >= area.start.y && person.y <= area.end.y) {
-						mainMap.personColor[person.personNumber] = area.color;
+		personFrameData.forEach(person => {
+			for (let i=0; i<person.length; i++) {
+				if (person[i].x >= area.start.x && person[i].x <= area.end.x
+					&& person[i].y >= area.start.y && person[i].y <= area.end.y) {
+						mainMap.personColor[person[i].personNumber] = area.color;
+						area.people.push(person[i].personNumber);
+						break;
 					}
-			})
-		}
+			}
+		})
 	})
 }
 
