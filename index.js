@@ -96,7 +96,9 @@ const undoButton = document.getElementById('stain-undo');
 const emptyButton = document.getElementById('stain-empty');
 
 var stainArea = []; //声明用来保存染色区域的数组
-
+var spaceNumList = []; //保存档当前染色空间所有人员序号的数组
+var spaceChangedList = []; //保存本次需操作DOM的序号数组
+var spaceDomList = [];
 //染色按钮绑定点击事件
 stainButton.addEventListener('click', () => {
 	stainMap.isStainMode = true;
@@ -133,7 +135,20 @@ stainCanvas.addEventListener('mousemove', evt => {
 });
 stainCanvas.addEventListener('mouseup', evt => {
 	stainMap.dragStatus = false;
-	stainPerson();
+	stainPersonOnSpace();
+	//向本次需操作DOM的序号数组中写入全新的序号
+	spaceChangedList = [];
+	stainArea[stainArea.length-1].people.forEach(x => {
+		if (!spaceNumList.includes(x)) {
+			spaceChangedList.push(x);
+		}
+	});
+
+	changePersonList('space-list-content', spaceDomList, spaceChangedList, 'add');
+
+	//向染色空间所有人员序号的数组添加新区域中的所有序号
+	spaceNumList = spaceNumList.concat([...stainArea[stainArea.length-1].people]);
+
 	mainMap.drawFrame(controller.getCurrentFrame());
 });
 stainCanvas.addEventListener('mouseout', evt => {
@@ -147,7 +162,15 @@ undoButton.addEventListener('click', e => {
 		stainMap.imageData = data;
 		stainMap.restoreData();
 		const people = stainArea.pop().people;
-		people.forEach(x => mainMap.personColor[x] = 'white');
+		spaceChangedList = []; //重置改变数组，准备保存本次操作需要的序号
+		people.forEach(x => {
+			spaceNumList.splice(spaceNumList.indexOf(x),1); //先删除一次
+			//若剩余没有该值则可推入改变数组并修改对应人员的color
+			if (!spaceNumList.includes(x)) {
+				mainMap.personColor[x] = 'white';
+				spaceChangedList.push(x);
+			}
+		});
 		mainMap.drawFrame(controller.getCurrentFrame());
 	}	
 });
@@ -164,48 +187,18 @@ emptyButton.addEventListener('click', e => {
 	mainMap.drawFrame(controller.getCurrentFrame());
 })
 
-//将轨迹数据按帧拆分
-function timeFrameSplit (arr) {
-	let temp = [];
-	let index = -1;
-	let timeIdx = [];
-	arr.forEach( x => {
-		if(! timeIdx.includes(x.frame)) {
-			timeIdx.push(x.frame);
-			temp[++index] = [];
-			temp[index].push(x);
-		} else {
-			temp[index].push(x);
+//根据stainArea对象数组改变localFrameData中对应人员的颜色属性
+function stainPersonOnSpace () {
+	const area = stainArea[stainArea.length - 1];
+	personFrameData.forEach(person => {
+		for (let i=0; i<person.length; i++) {
+			if (person[i].x >= area.start.x && person[i].x <= area.end.x
+				&& person[i].y >= area.start.y && person[i].y <= area.end.y) {
+					mainMap.personColor[person[i].personNumber] = area.color;
+					area.people.push(person[i].personNumber);
+					break;
+				}
 		}
 	});
-	return temp;
-}
-//将轨迹数据按人员拆分
-function personFrameSplit (arr, length) {
-	let temp = [];
-	//temp.fill([])将导致bug，所有成员指向同一个数组内存地址。
-	for (let i=0; i<length; i++) {
-		temp[i] = [];
-	}
-	arr.forEach(x => {
-		temp[x.personNumber].push(x);
-	});
-	return temp;
-}
-
-//根据stainArea对象数组改变localFrameData中对应人员的颜色属性
-function stainPerson () {
-	stainArea.forEach(area => {
-		personFrameData.forEach(person => {
-			for (let i=0; i<person.length; i++) {
-				if (person[i].x >= area.start.x && person[i].x <= area.end.x
-					&& person[i].y >= area.start.y && person[i].y <= area.end.y) {
-						mainMap.personColor[person[i].personNumber] = area.color;
-						area.people.push(person[i].personNumber);
-						break;
-					}
-			}
-		})
-	})
 }
 
