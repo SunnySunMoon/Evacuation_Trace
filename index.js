@@ -94,6 +94,7 @@ locationDataPromise.
 const stainButton = document.getElementById('stain-button');
 const undoButton = document.getElementById('stain-undo');
 const emptyButton = document.getElementById('stain-empty');
+const spaceReverseButton = document.getElementById('stain-space-reverse');
 
 var stainArea = []; //声明用来保存染色区域的数组
 var spaceNumList = []; //保存档当前染色空间所有人员序号的数组
@@ -171,6 +172,8 @@ undoButton.addEventListener('click', e => {
 				spaceChangedList.push(x);
 			}
 		});
+		//撤销染色名单
+		changePersonList('space-list-content', spaceDomList, spaceChangedList, 'remove');
 		mainMap.drawFrame(controller.getCurrentFrame());
 	}	
 });
@@ -183,7 +186,32 @@ emptyButton.addEventListener('click', e => {
 	stainMap.restoreData();
 	mainMap.personColor.forEach((x,i,arr) => {
 		arr[i] = 'white';
+	});
+	//清空空间染色DOM数组及名单
+	spaceDomList = [];
+	document.getElementById('space-list-content').innerHTML = '';
+
+	mainMap.drawFrame(controller.getCurrentFrame());
+});
+
+//翻转空域染色名单
+spaceReverseButton.addEventListener('click', e => {
+	const reversed = [...personData];
+	let offset = 0;
+	spaceDomList.forEach(x => {
+		reversed.splice(x.num-offset, 1);
+		mainMap.personColor[x.num] = 'white';
+		offset++;
+	});
+	const reversedNum = reversed.map(x => parseInt(x.number));
+	reversedNum.forEach(x => {
+		mainMap.personColor[x] = 'rgba(0, 255, 0, 0.8)';
 	})
+	//清空空间染色DOM数组及名单
+	spaceDomList = [];
+	document.getElementById('space-list-content').innerHTML = '';
+	//添加翻转
+	changePersonList('space-list-content',spaceDomList,reversedNum, 'add');
 	mainMap.drawFrame(controller.getCurrentFrame());
 })
 
