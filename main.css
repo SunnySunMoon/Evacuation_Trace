@@ -59,6 +59,10 @@ body {
   cursor: crosshair;
   display: none;
 }
+/*前进后退开始停止按钮*/
+.controller__plugin:not(:nth-child(1)) {
+  display: inline-block;
+}
 
 /* 滑动条 */
 .controller__processBar {
@@ -102,4 +106,9 @@ body {
   box-shadow: 1px 1px 2px 2px lightgray;
   display: none;
   transition: all 0.5s
+}
+
+#time-zone {
+  border: 1px solid lightcoral;
+  margin: 0 0 2em 5em;
 }
