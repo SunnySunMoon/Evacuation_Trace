@@ -127,7 +127,7 @@ const pluginProcessBar = {
       <div class="processBar--past"></div>
       <div class="processBar--ahead"></div>
       <span class="processBar--slider"></span>  
-    </div>`
+    </div><br/>`
   },
   action (controller) {
     let processBar = controller.rootDom.querySelector('.controller__processBar'), 
