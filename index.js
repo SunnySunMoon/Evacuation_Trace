@@ -230,3 +230,5 @@ function stainPersonOnSpace () {
 	});
 }
 
+const timeZone = new TimeZone('time-zone', localFrameData.length);
+

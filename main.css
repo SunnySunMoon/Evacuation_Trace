@@ -109,6 +109,6 @@ body {
 }
 
 #time-zone {
-  border: 1px solid lightcoral;
-  margin: 0 0 2em 5em;
+  margin: 0 0 20px 20px;
+  outline: 3px solid lightblue;
 }

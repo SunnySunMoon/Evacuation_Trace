@@ -14,7 +14,7 @@ class TimeZone extends Canvas {
         console.log(e.clientX, e.clientY, e);
         let loc = this.windowToCanvas(e.pageX, e.pageY);
         let area = {
-          start: Math.floor(loc.x /this.step),
+          start: loc.x,
           end: undefined,
           color: 'yellow',
           num: [], //保存染色人员序号，或其他数据
@@ -26,11 +26,22 @@ class TimeZone extends Canvas {
       if (this.isStainMode && this.dragStatus) {
         let loc = this.windowToCanvas(e.pageX, e.pageY);
         let area = this.stainArea[this.stainArea.length - 1];
-        area.end = Math.floor(loc.x / this.step);
+        // area.end = Math.floor(loc.x / this.step);
+        area.end = loc.x
         this.restoreData();
         this.drawRect(area);
       }
     });
+    this.canvas.addEventListener('mouseup', e => {
+      this.dragStatus = false;
+      /* 染色相关操作 
+      
+      
+      */   
+    });
+    this.canvas.addEventListener('mouseout', e => {
+      this.dragStatus = false;
+    })
   }
 
   //绘制染色区域
