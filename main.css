@@ -109,6 +109,17 @@ body {
 }
 
 #time-zone {
-  margin: 0 0 20px 20px;
+  margin: 0 0 20px 25px;
   outline: 3px solid lightblue;
+  border-left-width: 10px;
+  position: absolute;
+  height: 40px;
+  width: 1000px;
+  top: 710px;
+  display: none;
+}
+#time-stain-controller {
+  position: absolute;
+  top: 720px;
+  left: 1050px;
 }
