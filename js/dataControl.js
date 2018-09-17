@@ -154,6 +154,8 @@ const pluginProcessBar = {
         evt.stopPropagation();
         drag = true;
       });
+      //防止点击滑块冒泡到processBar，因为滑块存在部分区域超出了轨道的情况。
+      slider.addEventListener('click', e => e.stopPropagation());
       //鼠标松开后取消拖动状态
       document.addEventListener('mouseup', evt => {
         drag = false;
