@@ -11,12 +11,11 @@ class TimeZone extends Canvas {
       if (this.isStainMode) {
         this.dragStatus = true;
         this.statusArr.push(this.saveData());
-        console.log(e.clientX, e.clientY, e);
         let loc = this.windowToCanvas(e.pageX, e.pageY);
         let area = {
           start: loc.x,
           end: undefined,
-          color: 'yellow',
+          color: 'rgba(255,255,0,0.6)',
           num: [], //保存染色人员序号，或其他数据
         }
         this.stainArea.push(area);
@@ -26,7 +25,6 @@ class TimeZone extends Canvas {
       if (this.isStainMode && this.dragStatus) {
         let loc = this.windowToCanvas(e.pageX, e.pageY);
         let area = this.stainArea[this.stainArea.length - 1];
-        // area.end = Math.floor(loc.x / this.step);
         area.end = loc.x
         this.restoreData();
         this.drawRect(area);
@@ -34,10 +32,11 @@ class TimeZone extends Canvas {
     });
     this.canvas.addEventListener('mouseup', e => {
       this.dragStatus = false;
-      /* 染色相关操作 
+      /* 时间染色后主画布相关操作 
       
       
-      */   
+      */
+
     });
     this.canvas.addEventListener('mouseout', e => {
       this.dragStatus = false;
@@ -49,4 +48,55 @@ class TimeZone extends Canvas {
     this.ctx.fillStyle = area.color;
     this.ctx.fillRect(area.start, 0, area.end-area.start, this.canvas.clientHeight);
   }
+  //染色按钮绑定事件
+  bindStain (id) {
+    const stain = document.getElementById(id);
+    stain.addEventListener('click', e => {
+      this.isStainMode = true;
+      this.canvas.style.display = 'block';
+      this.canvas.style.zIndex = '2';  //置于滑动条上层
+    });
+  } 
+  //退出染色mode绑定事件
+  bindExit (id) {
+    const exit = document.getElementById(id);
+    exit.addEventListener('click', e => {
+      this.isStainMode = false;
+      if(this.stainArea.length == 0) {
+        this.canvas.style.display = 'none'; //若一个染色区也不存在，则整个隐藏
+      }
+      this.canvas.style.zIndex = '-1';  //置于滑动条下层
+    });
+  }
+  //撤销按钮绑定事件
+  bindUndo (id) {
+    const undo = document.getElementById(id);
+    undo.addEventListener('click', e => {
+      const data = this.statusArr.pop();
+      if (data != undefined) {
+        this.imageData = data;
+        this.restoreData();
+        /*
+          其它响应操作
+        */ 
+      }
+    });
+  }
+  //清空按钮绑定
+  bindEmpty (id) {
+    const empty = document.getElementById(id);
+    empty.addEventListener('click', e => {
+      const data = this.statusArr[0];
+      this.statusArr = [];
+      this.stainArea = [];
+      this.imageData = data;
+      if (data != undefined) {
+        this.restoreData();
+      }
+      /*
+        其它响应操作
+      */ 
+    })
+  }
 }
+

@@ -160,6 +160,7 @@ stainCanvas.addEventListener('mouseout', evt => {
 undoButton.addEventListener('click', e => {
 	const data = stainMap.statusArr.pop();
 	if (data != undefined) {
+		stainArea.pop(); //保存的染色区域也应该撤销一次
 		stainMap.imageData = data;
 		stainMap.restoreData();
 		const people = stainArea.pop().people;
@@ -183,15 +184,16 @@ emptyButton.addEventListener('click', e => {
 	stainMap.statusArr = [];
 	stainArea = [];
 	stainMap.imageData = data;
-	stainMap.restoreData();
-	mainMap.personColor.forEach((x,i,arr) => {
-		arr[i] = 'white';
-	});
-	//清空空间染色DOM数组及名单
-	spaceDomList = [];
-	document.getElementById('space-list-content').innerHTML = '';
-
-	mainMap.drawFrame(controller.getCurrentFrame());
+	if (data != undefined) {
+		stainMap.restoreData();
+		mainMap.personColor.forEach((x,i,arr) => {
+			arr[i] = 'white';
+		});
+		//清空空间染色DOM数组及名单
+		spaceDomList = [];
+		document.getElementById('space-list-content').innerHTML = '';
+		mainMap.drawFrame(controller.getCurrentFrame());
+	}
 });
 
 //翻转空域染色名单
@@ -231,4 +233,7 @@ function stainPersonOnSpace () {
 }
 
 const timeZone = new TimeZone('time-zone', localFrameData.length);
-
+timeZone.bindStain('time-stain');
+timeZone.bindExit('time-exit');
+timeZone.bindUndo('time-undo');
+timeZone.bindEmpty('time-empty');
