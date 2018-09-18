@@ -1,11 +1,12 @@
 class TimeZone extends Canvas {
-  constructor (id, length = 100) {
+  constructor (id, data) {
     super(id);
-    this.length = length; //总帧数
-    this.step = (this.canvas.clientWidth/length).toFixed(1); //单位长度
+    this.data = data;
+    this.length = data[0].length; //总帧数
     this.isStainMode = false; //染色开关
     this.dragStatus = false;  //拖拽状态
     this.stainArea = [];  //用于存储染色区域对象
+    this.peopleColor = new Array(data.length) .fill('white');
 
     this.canvas.addEventListener('mousedown', e => {
       if (this.isStainMode) {
@@ -15,7 +16,7 @@ class TimeZone extends Canvas {
         let area = {
           start: loc.x,
           end: undefined,
-          color: 'rgba(255,255,0,0.6)',
+          color: 'rgba(255,255,0,0.4)',
           num: [], //保存染色人员序号，或其他数据
         }
         this.stainArea.push(area);
@@ -32,6 +33,8 @@ class TimeZone extends Canvas {
     });
     this.canvas.addEventListener('mouseup', e => {
       this.dragStatus = false;
+      const scope = this.stainArea[this.stainArea.length-1];
+      this.getMoved(scope);
       /* 时间染色后主画布相关操作 
       
       
@@ -98,5 +101,24 @@ class TimeZone extends Canvas {
       */ 
     })
   }
+
+  //计算染色时间段存在活动的数据
+  getMoved (scope) {
+    const width = this.canvas.clientWidth;
+    const data = this.data;
+    let start = Math.floor(data[0].length * (scope.start / width));
+    let end   = Math.ceil(data[0].length * (scope.end / width));
+    start < end ? true : [start,end] = [end, start]; //确保start在end前
+    debugger
+    for (let i=0; i<data.length; i++) {
+      for (let j=start; j<end; j++) {
+        if (data[i][j].x != data[i][j+1].x || data[i][j].y != data[i][j+1].y) {
+          this.peopleColor[i] = scope.color;
+          break;
+        }
+      }
+    }
+  }
+
 }
 

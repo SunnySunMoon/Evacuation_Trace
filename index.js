@@ -3,6 +3,7 @@ const stainCanvas = document.getElementById('stain-canvas');
 //绘制网格地图
 const mainMap = new BuildingMap('canvas', 10);
 const stainMap = new BuildingMap('stain-canvas', 10);
+var   timeZone = null; //用于保存时域染色实例的全局变量
 var mapData = [];
 //获取建筑地图原始数据并绘制地图
 ajax('./data/BUILDING_DATA.txt').then(str => {
@@ -85,6 +86,12 @@ locationDataPromise.
 			let idx = controller.getCurrentIdx();
 			stainMap.hoverBox(evt.pageX, evt.pageY, localFrameData[idx]);
 		});
+		//创建时域染色实例并绑定功能按钮
+		timeZone = new TimeZone('time-zone', personFrameData);
+		timeZone.bindStain('time-stain');
+		timeZone.bindExit('time-exit');
+		timeZone.bindUndo('time-undo');
+		timeZone.bindEmpty('time-empty');
 	});
 
 
@@ -124,7 +131,7 @@ stainCanvas.addEventListener('mousedown', evt => {
 stainCanvas.addEventListener('mousemove', evt => {
 	let loc = stainMap.windowToCanvas(evt.pageX, evt.pageY);
 	if (stainMap.dragStatus && stainMap.isStainMode) {
-		stainArea[stainArea.length - 1].end = {
+		stainArea[stainArea.length - 1].end = { 
 			x: Math.floor(loc.x / (stainMap.step + 1)) - 1,
 			y: Math.floor(loc.y / (stainMap.step + 1)) - 1
 		}
@@ -232,8 +239,3 @@ function stainPersonOnSpace () {
 	});
 }
 
-const timeZone = new TimeZone('time-zone', localFrameData.length);
-timeZone.bindStain('time-stain');
-timeZone.bindExit('time-exit');
-timeZone.bindUndo('time-undo');
-timeZone.bindEmpty('time-empty');
