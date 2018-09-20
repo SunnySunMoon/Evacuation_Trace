@@ -1,12 +1,14 @@
 class TimeZone extends Canvas {
-  constructor (id, data) {
+  constructor (id, data, action=null) {
     super(id);
     this.data = data;
+    this.action = action; //未知的数据操作函数
     this.length = data[0].length; //总帧数
     this.isStainMode = false; //染色开关
     this.dragStatus = false;  //拖拽状态
     this.stainArea = [];  //用于存储染色区域对象
     this.peopleColor = new Array(data.length) .fill('white');
+    this.peopleInArea = [];  //记录所有染色区域中存在的人员号码，存在重复情况
 
     this.canvas.addEventListener('mousedown', e => {
       if (this.isStainMode) {
@@ -17,7 +19,7 @@ class TimeZone extends Canvas {
           start: loc.x,
           end: undefined,
           color: 'rgba(255,255,0,0.4)',
-          num: [], //保存染色人员序号，或其他数据
+          people: [], //保存染色人员序号，或其他数据
         }
         this.stainArea.push(area);
       }
@@ -35,10 +37,11 @@ class TimeZone extends Canvas {
       this.dragStatus = false;
       const scope = this.stainArea[this.stainArea.length-1];
       this.getMoved(scope);
-      /* 时间染色后主画布相关操作 
-      
-      
-      */
+      //判断数据操作函数是否存在，执行
+      if (this.action) {
+        this.action(this.peopleColor);
+        this.peopleInArea = this.peopleInArea.concat(scope.people);
+      }
 
     });
     this.canvas.addEventListener('mouseout', e => {
@@ -79,9 +82,20 @@ class TimeZone extends Canvas {
       if (data != undefined) {
         this.imageData = data;
         this.restoreData();
-        /*
-          其它响应操作
-        */ 
+        //其它响应操作
+        const people = this.stainArea.pop().people;
+        people.forEach(x => {
+          const idx = this.peopleInArea.indexOf(x);
+          this.peopleInArea.splice(idx, 1);  //删除一次
+          if (!this.peopleInArea.includes(x)) {
+            //确定该号码不在其它区域存在
+            this.peopleColor[x] = 'white';
+          }
+        });
+        //存在操作函数
+        if (this.action) {
+          this.action(this.peopleColor); //重新绘制
+        }
       }
     });
   }
@@ -95,10 +109,12 @@ class TimeZone extends Canvas {
       this.imageData = data;
       if (data != undefined) {
         this.restoreData();
+        this.peopleColor.fill('white');
+        this.peopleInArea = [];
+        if (this.action) {
+          this.action(this.peopleColor);
+        }
       }
-      /*
-        其它响应操作
-      */ 
     })
   }
 
@@ -109,11 +125,11 @@ class TimeZone extends Canvas {
     let start = Math.floor(data[0].length * (scope.start / width));
     let end   = Math.ceil(data[0].length * (scope.end / width));
     start < end ? true : [start,end] = [end, start]; //确保start在end前
-    debugger
     for (let i=0; i<data.length; i++) {
       for (let j=start; j<end; j++) {
         if (data[i][j].x != data[i][j+1].x || data[i][j].y != data[i][j+1].y) {
           this.peopleColor[i] = scope.color;
+          scope.people.push(i);
           break;
         }
       }
