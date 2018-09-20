@@ -118,7 +118,7 @@ const pluginStart = {
       })
     }
   }
-}
+} 
 //进度条
 const pluginProcessBar = {
   offset: 0,

@@ -86,8 +86,13 @@ locationDataPromise.
 			let idx = controller.getCurrentIdx();
 			stainMap.hoverBox(evt.pageX, evt.pageY, localFrameData[idx]);
 		});
+		
+		//定义一个绘图函数，作为action传入时域染色构造函数中
+		let action = function (colors) {
+			mainMap.drawFrame(controller.getCurrentFrame(), colors);
+		}
 		//创建时域染色实例并绑定功能按钮
-		timeZone = new TimeZone('time-zone', personFrameData);
+		timeZone = new TimeZone('time-zone', personFrameData, action);
 		timeZone.bindStain('time-stain');
 		timeZone.bindExit('time-exit');
 		timeZone.bindUndo('time-undo');
@@ -193,9 +198,7 @@ emptyButton.addEventListener('click', e => {
 	stainMap.imageData = data;
 	if (data != undefined) {
 		stainMap.restoreData();
-		mainMap.personColor.forEach((x,i,arr) => {
-			arr[i] = 'white';
-		});
+		mainMap.personColor.fill('white');
 		//清空空间染色DOM数组及名单
 		spaceDomList = [];
 		document.getElementById('space-list-content').innerHTML = '';

@@ -61,10 +61,14 @@ class BuildingMap extends Canvas{
     this.ctx.closePath();
   }
   //绘制一帧数据
-  drawFrame (dataFrame) {
+  /* 需要优化 */
+  drawFrame (dataFrame, colors = this.personColor) {
+    //更新内部的颜色数组，因为controller的几个调用是不提供colors的
+    //只有TimeZone 和 SpaceZone 的调用时才会提供colors。
+    this.personColor = colors; 
     this.restoreData();
     dataFrame.forEach(x => {
-      this.drawCircle(x.x, x.y, this.step/2 - 1, this.personColor[x.personNumber]);
+      this.drawCircle(x.x, x.y, this.step/2 - 1,colors[x.personNumber]);
     });
   }
 
