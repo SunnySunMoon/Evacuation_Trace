@@ -10,7 +10,7 @@ ajax('./data/BUILDING_DATA.txt').then(str => {
 	//以正则匹配的方式剔除换行
 	let strArr = str.replace(/[\r\n]/g, "").trim().split(' ');
 	let mapArr = [];
-	for (let i=0; i<strArr.length;) { 
+	for (let i=0; i<strArr.length;) {  
 		let row = [];
 		for (let j=0; j<91; j++) {
 			row.push(strArr[i]);
@@ -97,6 +97,8 @@ locationDataPromise.
 		timeZone.bindExit('time-exit');
 		timeZone.bindUndo('time-undo');
 		timeZone.bindEmpty('time-empty');
+		const stainList = document.getElementById('stain-list-content');
+		timeZone.bindListDom(stainList, personData);
 	});
 
 
@@ -157,7 +159,7 @@ stainCanvas.addEventListener('mouseup', evt => {
 		}
 	});
 
-	changePersonList('space-list-content', spaceDomList, spaceChangedList, 'add');
+	changePersonList('stain-list-content', spaceDomList, spaceChangedList, 'add');
 
 	//向染色空间所有人员序号的数组添加新区域中的所有序号
 	spaceNumList = spaceNumList.concat([...stainArea[stainArea.length-1].people]);
@@ -201,7 +203,7 @@ emptyButton.addEventListener('click', e => {
 		mainMap.personColor.fill('white');
 		//清空空间染色DOM数组及名单
 		spaceDomList = [];
-		document.getElementById('space-list-content').innerHTML = '';
+		document.getElementById('stain-list-content').innerHTML = '';
 		mainMap.drawFrame(controller.getCurrentFrame());
 	}
 });
@@ -221,9 +223,9 @@ spaceReverseButton.addEventListener('click', e => {
 	})
 	//清空空间染色DOM数组及名单
 	spaceDomList = [];
-	document.getElementById('space-list-content').innerHTML = '';
+	document.getElementById('stain-list-content').innerHTML = '';
 	//添加翻转
-	changePersonList('space-list-content',spaceDomList,reversedNum, 'add');
+	changePersonList('stain-list-content',spaceDomList,reversedNum, 'add');
 	mainMap.drawFrame(controller.getCurrentFrame());
 })
 

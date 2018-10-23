@@ -3,12 +3,14 @@ class TimeZone extends Canvas {
     super(id);
     this.data = data;
     this.action = action; //未知的数据操作函数
-    this.length = data[0].length; //总帧数
+    this.length = data[0].length; //总帧数 
     this.isStainMode = false; //染色开关
     this.dragStatus = false;  //拖拽状态
     this.stainArea = [];  //用于存储染色区域对象
-    this.peopleColor = new Array(data.length) .fill('white');
-    this.peopleInArea = [];  //记录所有染色区域中存在的人员号码，存在重复情况
+    this.dataColor = new Array(data.length) .fill('white');
+    this.allIds = [];  //记录所有染色区域中存在的对象的唯一标识，存在重复情况
+    this.listDom = null; //用于显示染色对象的DOM，默认没有
+    this.objects = []; //记录染色对象信息
 
     this.canvas.addEventListener('mousedown', e => {
       if (this.isStainMode) {
@@ -19,7 +21,7 @@ class TimeZone extends Canvas {
           start: loc.x,
           end: undefined,
           color: 'rgba(255,255,0,0.4)',
-          people: [], //保存染色人员序号，或其他数据
+          ids: [], //保存染色人员序号，或其他数据
         }
         this.stainArea.push(area);
       }
@@ -34,18 +36,14 @@ class TimeZone extends Canvas {
       }
     });
     this.canvas.addEventListener('mouseup', e => {
-      this.dragStatus = false;
-      const scope = this.stainArea[this.stainArea.length-1];
-      this.getMoved(scope);
-      //判断数据操作函数是否存在，执行
-      if (this.action) {
-        this.action(this.peopleColor);
-        this.peopleInArea = this.peopleInArea.concat(scope.people);
-      }
-
+      //监听抬起鼠标事件并对数据点染色
+      this.stainDataPoints();
     });
     this.canvas.addEventListener('mouseout', e => {
-      this.dragStatus = false;
+      //如果是拖动状态，则结束拖动并对数据点染色
+      if (this.dragStatus === true) {
+        this.stainDataPoints();
+      }
     })
   }
 
@@ -83,19 +81,20 @@ class TimeZone extends Canvas {
         this.imageData = data;
         this.restoreData();
         //其它响应操作
-        const people = this.stainArea.pop().people;
-        people.forEach(x => {
-          const idx = this.peopleInArea.indexOf(x);
-          this.peopleInArea.splice(idx, 1);  //删除一次
-          if (!this.peopleInArea.includes(x)) {
+        const ids = this.stainArea.pop().ids;
+        ids.forEach(x => {
+          const idx = this.allIds.indexOf(x);
+          this.allIds.splice(idx, 1);  //删除一次
+          if (!this.allIds.includes(x)) {
             //确定该号码不在其它区域存在
-            this.peopleColor[x] = 'white';
+            this.dataColor[x] = 'white';
           }
         });
         //存在操作函数
         if (this.action) {
-          this.action(this.peopleColor); //重新绘制
+          this.action(this.dataColor); //重新绘制
         }
+        this.createObjectsList();
       }
     });
   }
@@ -109,32 +108,67 @@ class TimeZone extends Canvas {
       this.imageData = data;
       if (data != undefined) {
         this.restoreData();
-        this.peopleColor.fill('white');
-        this.peopleInArea = [];
+        this.dataColor.fill('white');
+        this.allIds = [];
         if (this.action) {
-          this.action(this.peopleColor);
+          this.action(this.dataColor);
         }
+        this.createObjectsList();
       }
     })
+  }
+
+  //绑定名单展示区域
+  bindListDom (dom, arr) {
+    this.listDom = dom;
+    this.objects = arr;
   }
 
   //计算染色时间段存在活动的数据
   getMoved (scope) {
     const width = this.canvas.clientWidth;
     const data = this.data;
-    let start = Math.floor(data[0].length * (scope.start / width));
-    let end   = Math.ceil(data[0].length * (scope.end / width));
+    let start = Math.floor(this.length * (scope.start / width));
+    let end   = Math.ceil(this.length * (scope.end / width));
     start < end ? true : [start,end] = [end, start]; //确保start在end前
     for (let i=0; i<data.length; i++) {
       for (let j=start; j<end; j++) {
         if (data[i][j].x != data[i][j+1].x || data[i][j].y != data[i][j+1].y) {
-          this.peopleColor[i] = scope.color;
-          scope.people.push(i);
+          this.dataColor[i] = scope.color;
+          scope.ids.push(i);
           break;
         }
       }
     }
   }
 
+  //染色操作
+  stainDataPoints () {
+    this.dragStatus = false;
+    const scope = this.stainArea[this.stainArea.length-1];
+    this.getMoved(scope);
+    //判断数据操作函数是否存在，执行
+    if (this.action) {
+      this.action(this.dataColor);
+      this.allIds = this.allIds.concat(scope.ids);
+    }
+    this.createObjectsList();
+  }
+
+  //创建染色对象名单DOM
+  createObjectsList () {
+    if (this.listDom==null || this.objects.length==0) {
+      return false;
+    }
+    let singleArr = new Set(this.allIds);
+    singleArr = Array.from(singleArr);
+    this.listDom.innerHTML = "";
+    singleArr.forEach(x => {
+      let dom = document.createElement('div');
+      dom.classList.add('stain-list-item');
+      dom.textContent = x + '  ' + this.objects[x].name;
+      this.listDom.appendChild(dom);
+    })
+  }
 }
 
