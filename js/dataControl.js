@@ -25,7 +25,7 @@ class Controller {
   //注册插件
   registerPlugins (...plugins) {
     plugins.forEach(plugin => {
-      const pluginContainer = document.createElement('div');
+    const pluginContainer = document.createElement('div');
       pluginContainer.className = 'controller__plugin';
       //渲染插件，内容由插件自身定义
       pluginContainer.innerHTML = plugin.render();

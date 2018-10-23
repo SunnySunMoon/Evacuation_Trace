@@ -6,7 +6,7 @@ class BuildingMap extends Canvas{
     this.step = step;
     this.start = {}; //染色起始坐标
     this.end = {}; //染色结束坐标
-    this.dragStatus = false;  //染色拖动状态
+    this.dragStatus = false;  //染色拖动状态 
     this.isStainMode = false;  //染色模式是否开启
     this.personColor = [];
   }
