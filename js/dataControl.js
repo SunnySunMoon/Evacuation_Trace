@@ -141,11 +141,12 @@ const pluginProcessBar = {
         在slide事件的handler中统一修改进度条相关样式
       */
       //鼠标进度条点击跳转
+      const length = ahead.clientWidth;
       processBar.addEventListener('click', evt => {
         clearInterval(controller.timer);
         //只用写改变current 的代码，滑动条样式集中在事件监听函数写
         this.offset = evt.clientX - 20;
-        let idx = this.offset/1000 * controller.data.length;
+        let idx = this.offset/length * controller.data.length;
         idx = Math.ceil(idx);
         mainMap.drawFrame(controller.loadTo(idx-1));
       });
@@ -161,10 +162,10 @@ const pluginProcessBar = {
         drag = false;
       })
       processBar.addEventListener('mousemove', evt => {
-        if (drag && evt.clientX >= 20 && evt.clientX <= 1020) {
+        if (drag && evt.clientX >= 20 && evt.clientX <= length+20) {
           this.offset = evt.clientX - 20;
 
-          let idx = this.offset/1000 * controller.data.length;
+          let idx = this.offset/length * controller.data.length;
           idx = Math.ceil(idx);
           idx = idx == 0 ? 0 : idx - 1;
           mainMap.drawFrame(controller.loadTo(idx));
@@ -172,10 +173,10 @@ const pluginProcessBar = {
       });
       //监听其余控件引起的current改变事件
       controller.rootDom.addEventListener('slide', evt => {
-        this.offset = 1000 * evt.detail.idx/controller.data.length;
+        this.offset = length * evt.detail.idx/controller.data.length;
         slider.style.left = this.offset - 10 + 'px';
         past.style.width = this.offset  + 'px';
-        ahead.style.width = 1000 - this.offset + 'px';
+        ahead.style.width = length - this.offset + 'px';
       })
     }
   }
