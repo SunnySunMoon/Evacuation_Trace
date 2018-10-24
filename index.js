@@ -102,6 +102,7 @@ locationDataPromise.
 		spaceZone.bindEmpty($('stain-empty'));
 		spaceZone.bindExit($('space-exit'));
 		spaceZone.bindListDom($('space-list-content'), personData);
+		spaceZone.bindReverseList($('space-list-reverse'));
 		spaceZone.canvas.addEventListener('mousemove', e => {
 			let idx = controller.getCurrentIdx();
 			mainMap.hoverBox(e.pageX, e.pageY, localFrameData[idx]);
@@ -113,6 +114,7 @@ locationDataPromise.
 		timeZone.bindUndo($('time-undo'));
 		timeZone.bindEmpty($('time-empty'));
 		timeZone.bindListDom($('time-list-content'), personData);
+		timeZone.bindReverseList($('time-list-reverse'));
 	});
 
 

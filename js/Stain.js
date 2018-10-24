@@ -85,10 +85,7 @@
     dom.addEventListener('click', e => {
       this.isStainMode = false;
       //以下操作是为了保证原图层一些显示、功能不被染色图层给遮盖
-      if (this.stainArea.length == 0) {
-        this.canvas.style.display = 'none'; //若一个染色区也不存在，则整个隐藏
-      }
-      this.canvas.style.zIndex = '-1';  //置于原图层之下（原图层背景透明
+      this.canvas.style.display = 'none'; //若一个染色区也不存在，则整个隐藏
     });
   }
   //绑定撤销按钮
@@ -116,7 +113,6 @@
       }
     })
   }
-
   //绑定清空按钮
   bindEmpty (dom) {
     dom.addEventListener('click', e => {
@@ -140,6 +136,12 @@
     this.listDom = dom;
     this.objects = arr; //数据点信息数组
   }
+  //绑定反转名单按钮
+  bindReverseList (dom) {
+    dom.addEventListener('click', e => {
+      this.reverseObjectList();
+    })
+  }
   //创建染色对象名单DOM
   createObjectsList () {
     if (this.listDom == null || this.objects.length ==0) {
@@ -147,12 +149,30 @@
     }
     let singleArr = new Set(this.allIds);
     singleArr = Array.from(singleArr);
+    singleArr.sort((a, b) => a - b); //升序排列结果
     this.listDom.innerHTML = '';
     singleArr.forEach(x => {
       let dom = document.createElement('div');
       dom.classList.add('stain-list-item');
       dom.textContent = x + '  ' + this.objects[x].name;
       this.listDom.appendChild(dom);
+    })
+  }
+  //反转染色对象名单
+  reverseObjectList () {
+    if (this.objects.length == 0) {
+      return false;
+    }
+    this.listDom.innerHTML = '';
+    let singleArr = new Set(this.allIds);
+    singleArr = Array.from(singleArr);
+    this.objects.forEach(x => {
+      if (!singleArr.includes(parseInt(x.number))) {
+        let dom = document.createElement('div');
+        dom.classList.add('stain-list-item');
+        dom.textContent = x.number + '  ' + x.name;
+        this.listDom.appendChild(dom);
+      }
     })
   }
 

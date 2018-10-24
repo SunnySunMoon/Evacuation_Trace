@@ -43,6 +43,7 @@ class TimeZone extends Canvas {
       //如果是拖动状态，则结束拖动并对数据点染色
       if (this.dragStatus === true) {
         this.stainDataPoints();
+        this.dragStatus = false;
       }
     })
   }
@@ -144,7 +145,6 @@ class TimeZone extends Canvas {
 
   //染色操作
   stainDataPoints () {
-    this.dragStatus = false;
     const scope = this.stainArea[this.stainArea.length-1];
     this.getMoved(scope);
     //判断数据操作函数是否存在，执行
