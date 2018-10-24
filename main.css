@@ -5,7 +5,7 @@ html, body {
   transition: all 1s;
 }
 body {
-  background: #dddddd;
+  background: lightslategray;
 }
 .test {
   color: lightcoral;
@@ -14,12 +14,13 @@ body {
   margin-left: 20px;
   margin-right: 0px;
   padding: 0;
-  cursor: crosshair;
   background: #ffffff;
-  border: 10px dotted lightblue;
+  border: 10px solid lightslategray;
 }
 #stain-canvas {
   position: absolute;
+  cursor: crosshair;
+  z-index: -1;
   top: 0;
   left: 0;
   margin-left: 20px;
@@ -31,24 +32,9 @@ body {
 /* 空间域染色控件 */
 #stain-control {
   position: absolute;
-  left: 1050px;
+  left: 870px;
   top: 10px;
 }
-#stain-control>button:nth-of-type(n) {
-  margin-right: 10px;
-}
-/* 空间域染色人员名单 */
-#stain-list {
-  position: absolute;
-  left: 1050px;
-  top: 40px;
-}
-#stain-list header {
-  font-size: 25px;
-  font-weight: bold;
-  font-family: Arial, Helvetica, sans-serif;
-}
-
 
 #controls {
   margin: 20px 0 20px 20px;
@@ -64,10 +50,11 @@ body {
   display: inline-block;
 }
 
-/* 滑动条 */
+/*#region 滑动条 */
 .controller__processBar {
   user-select: none;
-  width: 1005px;
+  /* 需要比ahead初始宽度宽5px */
+  width: 805px;   
   height: 30px;
   line-height: 30px;
   position: relative;
@@ -83,7 +70,7 @@ body {
 }
 .processBar--ahead {
   background-color: lightgray;
-  width: 1000px;
+  width: 800px; 
 }
 .processBar--slider {
   position: absolute;
@@ -96,7 +83,7 @@ body {
   border: 1px solid lightgray;
   border-radius: 10px;
 }
-
+/*#endregion */
 .popOver {
   position: fixed;
   min-width: 150px;
@@ -111,15 +98,43 @@ body {
 #time-zone {
   margin: 0 0 20px 25px;
   outline: 3px solid lightblue;
+  cursor: crosshair;
   border-left-width: 10px;
   position: absolute;
   height: 40px;
-  width: 1000px;
-  top: 710px;
+  width: 800px;
+  top: 592px;
   display: none;
 }
 #time-stain-controller {
   position: absolute;
-  top: 720px;
-  left: 1050px;
+  top: 600px;
+  left: 870px;
 }
+
+/* #region 名单 */
+#stain-list {
+  position: absolute;
+  left: 870px;
+  top: 40px;
+}
+#stain-list header {
+  font-size: 25px;
+  font-weight: bold;
+  font-family: Arial, Helvetica, sans-serif;
+}
+.stain-list-content {
+  display: flex;
+  box-shadow: 0 0 7px 2px white;
+}
+.list-content {
+  height: 480px;
+  width: 200px;
+  overflow-y: scroll;
+}
+.list-button-wrapper {
+  text-align: center;
+  padding: 0.5em 0;
+}
+
+/* #endregion */

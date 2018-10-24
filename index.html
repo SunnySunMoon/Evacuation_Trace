@@ -8,14 +8,14 @@
   <link rel="stylesheet" href="main.css"> 
   <script src="./js/Canvas.js"></script>
   <script src="./js/BuildingMap.js"></script>
-  <script src="./js/TimeZone.js"></script>
+  <script src="./js/Stain.js"></script>
   <script src="./js/dataControl.js"></script>
   <script src="./js/ajax.js"></script>
   <script src="./js/function.js"></script>
 </head>
 <body>
-  <canvas class="map-canvas" id="canvas" width="1000" height="670">Canvas not supported</canvas>
-  <canvas class="map-canvas" id="stain-canvas" width="1000" height="670">Canvas Not Support</canvas>
+  <canvas class="map-canvas" id="canvas" width="820" height="550">Canvas not supported</canvas>
+  <canvas class="map-canvas" id="stain-canvas" width="820" height="550">Canvas Not Support</canvas>
   <div id="controls">
     
   </div>
@@ -24,16 +24,27 @@
     <button id="stain-button">Stain</button>
     <button id="stain-undo">Undo</button>
     <button id="stain-empty">Empty</button>
+    <button id="space-exit">Exit</button>
   </div>
 
   <div id="stain-list">
     <header>Stained People</header>
-    <button id="stain-space-reverse">Reverse</button>
-    <div id="stain-list-content">
-      
-    </div>
+    <section class="stain-list-content">
+      <div class="space-list">
+        <div class="list-button-wrapper">
+          <button id="space-list-reverse">Space-Scope Reverse</button>
+        </div>
+        <div id="space-list-content" class="list-content"></div>
+      </div>
+      <div class="time-list">
+        <div class="list-button-wrapper">
+          <button id="time-list-reverse">Time-Scope Reverse</button>
+        </div>
+        <div id="time-list-content" class="list-content"></div>
+      </div>
+    </section>
   </div>
-  <canvas id="time-zone" width="1000" height="40"></canvas>
+  <canvas id="time-zone" width="800" height="40"></canvas>
   <div id="time-stain-controller">
     <button id="time-stain">Stain</button>
     <button id="time-undo">Undo</button>
